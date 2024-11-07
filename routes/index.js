@@ -6,4 +6,6 @@ const multer = require('../libs/multer');
 router.post('/upload-image', multer.single('image'), MediaHandling.uploadImage);
 router.delete('/delete-image/:id', MediaHandling.deleteImage);
 
+router.get('/get-image', MediaHandling.getImage);
+
 module.exports = router;

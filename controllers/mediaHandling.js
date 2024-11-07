@@ -117,6 +117,32 @@ class MediaHandling {
         }
     }
 
+    static async getImage(req, res) {
+        try {
+            const images = await prisma.image.findMany({
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    url: true,
+                    fileId: true
+                }
+            });
+
+            res.status(200).json({
+                status: 'success',
+                message: 'Gambar berhasil diambil',
+                data: images
+            });
+        } catch (error) {
+            res.status(500).json({
+                status: 'error',
+                message: 'Gagal mengambil gambar',
+                error: error.message
+            });
+        }
+    }
+
 }
 
 module.exports = MediaHandling
