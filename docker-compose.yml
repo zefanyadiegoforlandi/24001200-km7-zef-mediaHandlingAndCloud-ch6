@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  express-app:
+    container_name: express-artwork
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:1q2w3e4r5t6y@postgres_container:5432/binar?schema=binar_schema"
+      IMAGEKIT_PUBLICKEY: "public_KALgPK8fNV6OE0gHtQYf52Syul0="
+      IMAGEKIT_PRIVATEKEY: "private_XjoP46IHrf8y7W2JWQRBXahN02k="
+      IMAGEKIT_URL: "https://imagekit.io/dashboard/url-endpoints/lksjdf7sd"
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx-container-artwork
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - express-app
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    restart: unless-stopped
+
+  database:
+    container_name: postgres-container-artwork
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1q2w3e4r5t6y
+      POSTGRES_DB: binar
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
