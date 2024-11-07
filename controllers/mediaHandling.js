@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 class MediaHandling {
 
-    //ini fitur update
     static async updateImage(req, res) {
         const { id } = req.params;
         const { title, description } = req.body;
