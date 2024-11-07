@@ -143,6 +143,48 @@ class MediaHandling {
         }
     }
 
+    static async getImageById(req, res) {
+        const { id } = req.params;
+        try {
+            const image = await prisma.image.findUnique({
+                where: { id: parseInt(id) }
+            });
+            if (!image) return res.status(404).json({ message: 'Gambar tidak ditemukan' });
+
+            res.status(200).json(image);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Gagal mengambil detail gambar', error });
+        }
+    }
+
+    static async deleteImage(req, res) {
+        const { fileId } = req.params; 
+    
+        console.log('fileId yang diterima:', fileId); 
+    
+        try {
+            const imageToDelete = await prisma.image.findUnique({
+                where: { fileId: fileId }
+            });
+    
+            if (!imageToDelete) {
+                return res.status(404).json({ message: 'Gambar tidak ditemukan' });
+            }
+    
+            await imagekit.deleteFile(fileId); 
+    
+            await prisma.image.delete({
+                where: { fileId: fileId }
+            });
+    
+            res.status(200).json({ message: 'Gambar berhasil dihapus' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Gagal menghapus gambar', error });
+        }
+    }
+
 }
 
 module.exports = MediaHandling

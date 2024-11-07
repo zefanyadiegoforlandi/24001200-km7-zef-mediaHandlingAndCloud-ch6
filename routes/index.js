@@ -10,4 +10,6 @@ router.put('/update-image/:id', multer.single('image'), MediaHandling.updateImag
 
 router.get('/get-image', MediaHandling.getImage);
 
+router.get('/get-image/:id', MediaHandling.getImageById);
+
 module.exports = router;
