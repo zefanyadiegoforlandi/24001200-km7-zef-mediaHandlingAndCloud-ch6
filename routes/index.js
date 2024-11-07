@@ -8,4 +8,6 @@ router.delete('/delete-image/:id', MediaHandling.deleteImage);
 router.put('/update-image/:id', multer.single('image'), MediaHandling.updateImage);
 
 
+router.get('/get-image', MediaHandling.getImage);
+
 module.exports = router;
