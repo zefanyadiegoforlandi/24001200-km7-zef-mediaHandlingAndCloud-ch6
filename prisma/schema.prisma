@@ -13,11 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Image {
-    id       Int    @id @default(autoincrement())
-    title    String
+model AllImage {
+    id          Int      @id @default(autoincrement())
+    title       String
     description String
-    url      String
-    fileId   String @unique 
+    imageURL    String
+    imageFieldId String   @unique
+    isActive    Boolean   @default(true) // Menambahkan isActive dengan default true
 }
 

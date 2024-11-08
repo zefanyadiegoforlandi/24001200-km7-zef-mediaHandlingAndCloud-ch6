@@ -18,14 +18,23 @@ class MediaHandling {
                 file: stringFile
             });
     
-            const imageRecord = await prisma.image.create({
+            // Memeriksa apakah isActive ada di req.body dan memastikan itu boolean
+            const isActive = (req.body.isActive === 'true' || req.body.isActive === true) 
+                ? true 
+                : (req.body.isActive === 'false' || req.body.isActive === false) 
+                ? false 
+                : undefined; // Tidak memberikan nilai jika tidak ada isActive
+    
+            const imageRecord = await prisma.allImage.create({
                 data: {
                     title: req.body.title,
                     description: req.body.description,
-                    url: uploadImage.url,
-                    fileId: uploadImage.fileId
+                    imageURL: uploadImage.url,
+                    imageFieldId: uploadImage.fileId,
+                    isActive: isActive // Prisma akan menangani default true jika isActive tidak diberikan
                 }
             });
+    
             res.status(201).json({
                 status: 'success',
                 message: 'Gambar berhasil diupload',
@@ -36,60 +45,30 @@ class MediaHandling {
             res.status(500).json({ error: 'Gagal menyimpan data' });
         }
     }
-   
-    ///ini fitur delete
-    static async deleteImage(req, res) {
-        const { id } = req.params;
-        const { title, description } = req.body;
-        const file = req.file;
     
-        if (!title && !description && !file) {
-            return res.status(400).json({ message: 'Title, description, atau image harus diisi untuk update.' });
-        }
     
-        const dataToUpdate = {};
-        if (title) dataToUpdate.title = title;
-        if (description) dataToUpdate.description = description;
-    
-        try {
-            if (file) {
-                const uploadResult = await imagekit.upload({
-                    file: file.buffer,
-                    fileName: file.originalname
-                });
-    
-                dataToUpdate.url = uploadResult.url;
-                dataToUpdate.fileId = uploadResult.fileId;
-            }
-    
-            const image = await prisma.image.update({
-                where: { id: Number(id) },
-                data: dataToUpdate
-            });
-    
-            res.status(200).json(image);
-        } catch (error) {
-            console.error(error);
-            if (error.code === 'P2025') {
-                return res.status(404).json({ message: 'Gambar tidak ditemukan' });
-            }
-            res.status(500).json({ message: 'Gagal mengedit gambar', error });
-        }
-    }
 
     static async updateImage(req, res) {
-        fitur/update
         const { id } = req.params;
-        const { title, description } = req.body;
+        const { title, description, isActive } = req.body;
         const file = req.file;
-    
-        if (!title && !description && !file) {
+      
+        if (!title && !description && !file && isActive === undefined) {
             return res.status(400).json({ message: 'Title, description, atau image harus diisi untuk update.' });
         }
     
         const dataToUpdate = {};
         if (title) dataToUpdate.title = title;
         if (description) dataToUpdate.description = description;
+    
+        // Memastikan isActive adalah boolean
+        if (isActive !== undefined) {
+            dataToUpdate.isActive = (isActive === 'true' || isActive === true) 
+                ? true 
+                : (isActive === 'false' || isActive === false) 
+                ? false 
+                : undefined;
+        }
     
         try {
             if (file) {
@@ -98,11 +77,11 @@ class MediaHandling {
                     fileName: file.originalname
                 });
     
-                dataToUpdate.url = uploadResult.url;
-                dataToUpdate.fileId = uploadResult.fileId;
+                dataToUpdate.imageURL = uploadResult.url;
+                dataToUpdate.imageFieldId = uploadResult.fileId;
             }
     
-            const image = await prisma.image.update({
+            const image = await prisma.allImage.update({
                 where: { id: Number(id) },
                 data: dataToUpdate
             });
@@ -116,25 +95,36 @@ class MediaHandling {
             res.status(500).json({ message: 'Gagal mengedit gambar', error });
         }
     }
+    
+    
 
     static async getImage(req, res) {
         try {
-            const images = await prisma.image.findMany({
+            // Mengambil gambar yang isActive = true, dan mengurutkan berdasarkan id dari kecil ke besar
+            const images = await prisma.allImage.findMany({
+                where: {
+                    isActive: true // Hanya mengambil gambar yang isActive true
+                },
+                orderBy: {
+                    id: 'asc' // Mengurutkan berdasarkan id dari kecil ke besar
+                },
                 select: {
                     id: true,
                     title: true,
                     description: true,
-                    url: true,
-                    fileId: true
+                    imageURL: true,
+                    imageFieldId: true
                 }
             });
-
+    
+            // Mengirim response dengan data gambar yang diambil
             res.status(200).json({
                 status: 'success',
                 message: 'Gambar berhasil diambil',
                 data: images
             });
         } catch (error) {
+            // Jika terjadi error, mengirim response error
             res.status(500).json({
                 status: 'error',
                 message: 'Gagal mengambil gambar',
@@ -142,40 +132,46 @@ class MediaHandling {
             });
         }
     }
-
+        
     static async getImageById(req, res) {
         const { id } = req.params;
+    
         try {
-            const image = await prisma.image.findUnique({
-                where: { id: parseInt(id) }
+            const image = await prisma.allImage.findFirst({
+                where: {
+                    id: parseInt(id),
+                    isActive: true // Hanya gambar dengan isActive true yang akan diambil
+                }
             });
-            if (!image) return res.status(404).json({ message: 'Gambar tidak ditemukan' });
-
+    
+            if (!image) {
+                return res.status(404).json({ message: 'Gambar tidak ditemukan atau tidak aktif' });
+            }
+    
             res.status(200).json(image);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Gagal mengambil detail gambar', error });
         }
     }
+    
 
     static async deleteImage(req, res) {
-        const { fileId } = req.params; 
-    
-        console.log('fileId yang diterima:', fileId); 
+        const { id } = req.params;
     
         try {
-            const imageToDelete = await prisma.image.findUnique({
-                where: { fileId: fileId }
+            const imageToDelete = await prisma.allImage.findUnique({
+                where: { id: parseInt(id) }
             });
     
             if (!imageToDelete) {
                 return res.status(404).json({ message: 'Gambar tidak ditemukan' });
             }
     
-            await imagekit.deleteFile(fileId); 
+            await imagekit.deleteFile(imageToDelete.imageFieldId);
     
-            await prisma.image.delete({
-                where: { fileId: fileId }
+            await prisma.allImage.delete({
+                where: { id: parseInt(id) }
             });
     
             res.status(200).json({ message: 'Gambar berhasil dihapus' });
@@ -184,6 +180,7 @@ class MediaHandling {
             res.status(500).json({ message: 'Gagal menghapus gambar', error });
         }
     }
+    
 
 }
 

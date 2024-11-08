@@ -1,5 +1,3 @@
-# Dockerfile
-
 FROM node:20-alpine
 
 WORKDIR /usr/src/app
@@ -16,5 +14,5 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-# Menjalankan aplikasi
-CMD ["npm", "start"]
+# Menambahkan perintah untuk menjalankan migrasi dan aplikasi
+CMD npx prisma migrate deploy && npm start

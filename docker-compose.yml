@@ -8,7 +8,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "postgresql://postgres:1q2w3e4r5t6y@postgres_container:5432/binar?schema=binar_schema"
+      DATABASE_URL: "postgresql://postgres:1q2w3e4r5t6y@postgres-container-artwork:5432/binar?schema=binar_schema"
       IMAGEKIT_PUBLICKEY: "public_KALgPK8fNV6OE0gHtQYf52Syul0="
       IMAGEKIT_PRIVATEKEY: "private_XjoP46IHrf8y7W2JWQRBXahN02k="
       IMAGEKIT_URL: "https://imagekit.io/dashboard/url-endpoints/lksjdf7sd"
