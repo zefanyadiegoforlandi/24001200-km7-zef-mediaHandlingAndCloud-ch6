@@ -13,4 +13,4 @@ const server = app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
 
-//jika ada ini berarti ci/cd berhasil
+//jika ada ini berarti ci/cd berhasil pastikan sudah ada .env
