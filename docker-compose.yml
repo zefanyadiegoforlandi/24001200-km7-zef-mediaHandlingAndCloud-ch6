@@ -22,13 +22,3 @@ services:
     volumes:
       - ./conf.d:/etc/nginx/conf.d
     restart: unless-stopped
-
-  database:
-    container_name: postgres-container-artwork
-    image: postgres:17
-    env_file: .env
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
