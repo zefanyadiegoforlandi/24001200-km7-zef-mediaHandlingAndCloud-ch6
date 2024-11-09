@@ -53,7 +53,7 @@ jobs:
             git pull origin main  # Menarik perubahan terbaru dari GitHub
 
             # Pull image terbaru dari Docker Hub
-            docker pull zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
+            docker pull zefanyadiegoforlandi/24001200-km7-zef-mediaHandlingAndGCP-ch6:latest
 
             # Re-create dan start containers dengan image terbaru
             docker-compose down
