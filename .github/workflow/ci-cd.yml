@@ -14,11 +14,11 @@ jobs:
           node-version: 18
 
       - name: Build Docker image for testing
-        run: docker build . --file Dockerfile --tag my-dockerhub-username/express-artwork:test
+        run: docker build . --file Dockerfile --tag zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:test
 
       - name: Run tests in Docker container
         run: |
-          docker run --rm my-dockerhub-username/express-artwork:test npm test
+          docker run --rm zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:test npm test
 
   publish:
     needs: build
@@ -34,27 +34,27 @@ jobs:
 
       - name: Build and push Docker image to Docker Hub
         run: |
-          docker build . --file Dockerfile --tag my-dockerhub-username/express-artwork:latest
-          docker push my-dockerhub-username/express-artwork:latest
+          docker build . --file Dockerfile --tag zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
+          docker push zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
 
   deploy:
-  needs: publish
-  runs-on: ubuntu-latest
-  steps:
-    - name: SSH to Server and Deploy
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          # Pull the latest image from Docker Hub
-          docker pull my-dockerhub-username/express-artwork:latest
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH to Server and Deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # SSH ke server dan update Git repository
+            cd /var/www/html/binar/24001200-km7-zef-mediahandlingandgcp-ch6/24001200-km7-zef-mediahandlingandgcp-ch6
+            git pull origin main  # Menarik perubahan terbaru dari GitHub
 
-          # Navigate to the project directory with docker-compose.yml on server
-          cd /var/www/html/binar/24001200-km7-zef-mediahandlingandgcp-ch6/24001200-km7-zef-mediahandlingandgcp-ch6
+            # Pull image terbaru dari Docker Hub
+            docker pull zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
 
-          # Re-create and start containers with the new image
-          docker-compose down
-          docker-compose up -d --build
-
+            # Re-create dan start containers dengan image terbaru
+            docker-compose down
+            docker-compose up -d --build
