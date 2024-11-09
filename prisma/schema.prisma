@@ -21,4 +21,3 @@ model AllImage {
     imageFieldId String   @unique
     isActive    Boolean   @default(true) // Menambahkan isActive dengan default true
 }
-

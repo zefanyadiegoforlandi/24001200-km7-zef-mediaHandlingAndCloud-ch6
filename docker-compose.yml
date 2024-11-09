@@ -7,11 +7,7 @@ services:
       context: .
     ports:
       - "3000:3000"
-    environment:
-      DATABASE_URL: "postgresql://postgres:1q2w3e4r5t6y@postgres-container-artwork:5432/binar?schema=binar_schema"
-      IMAGEKIT_PUBLICKEY: "public_KALgPK8fNV6OE0gHtQYf52Syul0="
-      IMAGEKIT_PRIVATEKEY: "private_XjoP46IHrf8y7W2JWQRBXahN02k="
-      IMAGEKIT_URL: "https://imagekit.io/dashboard/url-endpoints/lksjdf7sd"
+    env_file: .env  # Menambahkan ini untuk menggunakan .env
     depends_on:
       - database
     restart: unless-stopped
@@ -20,7 +16,7 @@ services:
     container_name: nginx-container-artwork
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       - express-app
     volumes:
@@ -30,11 +26,9 @@ services:
   database:
     container_name: postgres-container-artwork
     image: postgres:17
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1q2w3e4r5t6y
-      POSTGRES_DB: binar
+    env_file: .env
     ports:
       - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
     restart: unless-stopped
-
