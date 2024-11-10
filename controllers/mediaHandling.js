@@ -108,13 +108,12 @@ class MediaHandling {
 
     static async getImage(req, res) {
         try {
-            // Mengambil gambar yang isActive = true, dan mengurutkan berdasarkan id dari kecil ke besar
             const images = await prisma.allImage.findMany({
                 where: {
-                    isActive: true // Hanya mengambil gambar yang isActive true
+                    isActive: true 
                 },
                 orderBy: {
-                    id: 'asc' // Mengurutkan berdasarkan id dari kecil ke besar
+                    id: 'asc' 
                 },
                 select: {
                     id: true,
@@ -125,14 +124,12 @@ class MediaHandling {
                 }
             });
     
-            // Mengirim response dengan data gambar yang diambil
             res.status(200).json({
                 status: 'success',
                 message: 'Gambar berhasil diambil',
                 data: images
             });
         } catch (error) {
-            // Jika terjadi error, mengirim response error
             res.status(500).json({
                 status: 'error',
                 message: 'Gagal mengambil gambar',
@@ -148,7 +145,7 @@ class MediaHandling {
             const image = await prisma.allImage.findFirst({
                 where: {
                     id: parseInt(id),
-                    isActive: true // Hanya gambar dengan isActive true yang akan diambil
+                    isActive: true
                 }
             });
     
@@ -156,7 +153,11 @@ class MediaHandling {
                 return res.status(404).json({ message: 'Gambar tidak ditemukan atau tidak aktif' });
             }
     
-            res.status(200).json(image);
+            res.status(200).json({
+                status: 'success',
+                message: 'Gambar berhasil diambil',
+                data: image
+            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Gagal mengambil detail gambar', error });
