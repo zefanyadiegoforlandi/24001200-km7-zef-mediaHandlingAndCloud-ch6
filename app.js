@@ -16,3 +16,4 @@ const server = app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
 
+//cek aws
