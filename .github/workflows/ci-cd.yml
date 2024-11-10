@@ -33,7 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch seluruh riwayat commit untuk memastikan git pull berjalan dengan benar
+          fetch-depth: 0
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -57,21 +57,15 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # SSH ke server dan update Git repository
             cd /home/ubuntu/24001200-km7-zef-mediahandlingandgcp-ch6
-            
-            # Pastikan berada di branch main sebelum pull
+
             git checkout main
             
-            # Menarik perubahan terbaru dari GitHub
-            git pull origin main
+            sudo git pull origin main
 
-            # Pull image terbaru dari Docker Hub
             docker pull zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
 
-            # Re-create dan start containers dengan image terbaru
             docker-compose down
             docker-compose up --build -d
 
-            # Verifikasi container berjalan
             docker ps -a
