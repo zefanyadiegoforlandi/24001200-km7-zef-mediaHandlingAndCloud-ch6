@@ -1,48 +1,50 @@
 const imagekit = require('../libs/imagekit');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const path = require('path');
 
 
 class MediaHandling {
 
     static async uploadImage(req, res) {
         try {
-            if (!req.body.title || !req.body.description) {
-                return res.status(400).json({ message: "Title, description, image harus diisi semua." });
+            if (!req.body.title || !req.body.description || !req.file) {
+                return res.status(400).json({ message: "Title, description, and image must be provided." });
             }
-    
+
+            const fileExtension = path.extname(req.file.originalname);
+            const uniqueFileName = `${Date.now()}${fileExtension}`;
             const stringFile = req.file.buffer.toString('base64');
-    
+
             const uploadImage = await imagekit.upload({
-                fileName: req.file.originalname,
+                fileName: uniqueFileName, 
                 file: stringFile
             });
-    
-            // Memeriksa apakah isActive ada di req.body dan memastikan itu boolean
+
             const isActive = (req.body.isActive === 'true' || req.body.isActive === true) 
                 ? true 
                 : (req.body.isActive === 'false' || req.body.isActive === false) 
                 ? false 
-                : undefined; // Tidak memberikan nilai jika tidak ada isActive
-    
+                : undefined;
+
             const imageRecord = await prisma.allImage.create({
                 data: {
                     title: req.body.title,
                     description: req.body.description,
                     imageURL: uploadImage.url,
                     imageFieldId: uploadImage.fileId,
-                    isActive: isActive // Prisma akan menangani default true jika isActive tidak diberikan
+                    isActive: isActive 
                 }
             });
-    
+
             res.status(201).json({
                 status: 'success',
-                message: 'Gambar berhasil diupload',
+                message: 'Image uploaded successfully.',
                 data: imageRecord
             });
         } catch (error) {
             console.error('Error during image upload:', error);
-            res.status(500).json({ error: 'Gagal menyimpan data' });
+            res.status(500).json({ error: 'Failed to save data.' });
         }
     }
     
