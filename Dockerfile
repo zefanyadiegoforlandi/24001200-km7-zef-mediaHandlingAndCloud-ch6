@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:23-alpine
 
 WORKDIR /usr/src/app
 
@@ -15,4 +15,4 @@ RUN npx prisma generate
 EXPOSE 3000
 
 # Menambahkan perintah untuk menjalankan migrasi dan aplikasi
-CMD npx prisma migrate deploy && npm start
+CMD npm start
