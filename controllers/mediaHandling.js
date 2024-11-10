@@ -117,10 +117,7 @@ class MediaHandling {
                 },
                 select: {
                     id: true,
-                    title: true,
-                    description: true,
-                    imageURL: true,
-                    imageFieldId: true
+                    imageURL: true
                 }
             });
     
