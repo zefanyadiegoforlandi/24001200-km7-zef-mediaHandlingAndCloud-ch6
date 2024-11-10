@@ -60,6 +60,8 @@ jobs:
             cd /home/ubuntu/24001200-km7-zef-mediahandlingandgcp-ch6
 
             git checkout main
+
+            git config --global --add safe.directory /home/ubuntu/24001200-km7-zef-mediaHandlingAndCloud-ch6
             
             sudo git pull origin main
 
