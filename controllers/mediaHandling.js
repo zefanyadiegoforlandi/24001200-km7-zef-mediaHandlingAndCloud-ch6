@@ -54,16 +54,15 @@ class MediaHandling {
         const { id } = req.params;
         const { title, description, isActive } = req.body;
         const file = req.file;
-      
+
         if (!title && !description && !file && isActive === undefined) {
-            return res.status(400).json({ message: 'Title, description, atau image harus diisi untuk update.' });
+            return res.status(400).json({ message: 'Title, description, or image must be provided for update.' });
         }
-    
+
         const dataToUpdate = {};
         if (title) dataToUpdate.title = title;
         if (description) dataToUpdate.description = description;
-    
-        // Memastikan isActive adalah boolean
+
         if (isActive !== undefined) {
             dataToUpdate.isActive = (isActive === 'true' || isActive === true) 
                 ? true 
@@ -71,30 +70,37 @@ class MediaHandling {
                 ? false 
                 : undefined;
         }
-    
+
         try {
             if (file) {
+                const timestamp = Date.now();
+                const newFileName = `${timestamp}${path.extname(file.originalname)}`;
+
                 const uploadResult = await imagekit.upload({
                     file: file.buffer,
-                    fileName: file.originalname
+                    fileName: newFileName
                 });
-    
+
                 dataToUpdate.imageURL = uploadResult.url;
                 dataToUpdate.imageFieldId = uploadResult.fileId;
             }
-    
+
             const image = await prisma.allImage.update({
                 where: { id: Number(id) },
                 data: dataToUpdate
             });
-    
-            res.status(200).json(image);
+
+            res.status(200).json({
+                status: 'success',
+                message: 'Image updated successfully.',
+                data: image
+            });
         } catch (error) {
-            console.error(error);
+            console.error('Error during image update:', error);
             if (error.code === 'P2025') {
-                return res.status(404).json({ message: 'Gambar tidak ditemukan' });
+                return res.status(404).json({ message: 'Image not found.' });
             }
-            res.status(500).json({ message: 'Gagal mengedit gambar', error });
+            res.status(500).json({ message: 'Failed to edit image.', error });
         }
     }
     
