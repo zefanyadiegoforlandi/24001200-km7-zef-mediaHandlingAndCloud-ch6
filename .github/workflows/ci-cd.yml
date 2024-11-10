@@ -57,12 +57,12 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/ubuntu/24001200-km7-zef-mediahandlingandgcp-ch6
+            cd /home/ubuntu/24001200-km7-zef-mediaHandlingAndCloud-ch6
 
             git checkout main
 
             git config --global --add safe.directory /home/ubuntu/24001200-km7-zef-mediaHandlingAndCloud-ch6
-            
+
             sudo git pull origin main
 
             docker pull zefanyadiegoforlandi/24001200-km7-zef-mediahandlingandgcp-ch6:latest
