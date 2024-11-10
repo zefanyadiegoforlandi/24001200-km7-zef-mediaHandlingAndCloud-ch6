@@ -21,11 +21,6 @@ class MediaHandling {
                 file: stringFile
             });
 
-            const isActive = (req.body.isActive === 'true' || req.body.isActive === true) 
-                ? true 
-                : (req.body.isActive === 'false' || req.body.isActive === false) 
-                ? false 
-                : undefined;
 
             const imageRecord = await prisma.allImage.create({
                 data: {
@@ -33,7 +28,6 @@ class MediaHandling {
                     description: req.body.description,
                     imageURL: uploadImage.url,
                     imageFieldId: uploadImage.fileId,
-                    isActive: isActive 
                 }
             });
 
@@ -52,24 +46,16 @@ class MediaHandling {
 
     static async updateImage(req, res) {
         const { id } = req.params;
-        const { title, description, isActive } = req.body;
+        const { title, description } = req.body;
         const file = req.file;
 
-        if (!title && !description && !file && isActive === undefined) {
+        if (!title && !description && !file === undefined) {
             return res.status(400).json({ message: 'Title, description, or image must be provided for update.' });
         }
 
         const dataToUpdate = {};
         if (title) dataToUpdate.title = title;
         if (description) dataToUpdate.description = description;
-
-        if (isActive !== undefined) {
-            dataToUpdate.isActive = (isActive === 'true' || isActive === true) 
-                ? true 
-                : (isActive === 'false' || isActive === false) 
-                ? false 
-                : undefined;
-        }
 
         try {
             if (file) {
@@ -109,14 +95,12 @@ class MediaHandling {
     static async getImage(req, res) {
         try {
             const images = await prisma.allImage.findMany({
-                where: {
-                    isActive: true 
-                },
                 orderBy: {
                     id: 'asc' 
                 },
                 select: {
                     id: true,
+                    title: true,
                     imageURL: true
                 }
             });
@@ -142,7 +126,6 @@ class MediaHandling {
             const image = await prisma.allImage.findFirst({
                 where: {
                     id: parseInt(id),
-                    isActive: true
                 }
             });
     
